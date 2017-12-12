@@ -25,6 +25,7 @@ void onMessage(const muduo::net::TcpConnectionPtr& conn,
     const char *clf = buff->findCRLF();
     if (clf) {
         muduo::string user(buff->peek(), clf);
+        LOG_INFO << "Receive message : " << user;
         conn->send(getUser(user) + "\r\n");
         buff->retrieveUntil(clf + 2);
         conn->shutdown();
