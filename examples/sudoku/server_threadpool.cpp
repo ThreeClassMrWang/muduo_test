@@ -14,7 +14,7 @@ using namespace std::placeholders;
 
 class SudokuServer {
 public:
-    SudokuServer(uint16_t short port, muduo::string name, int workThreadNum, int computeThreadNum) :
+    SudokuServer(uint16_t port, muduo::string name, int workThreadNum, int computeThreadNum) :
             loop_(), server_(&loop_, muduo::net::InetAddress(port), name),
             threadPool_("Sudoku Solver"),
             workThreadNum_(workThreadNum), computeThreadNum_(computeThreadNum){

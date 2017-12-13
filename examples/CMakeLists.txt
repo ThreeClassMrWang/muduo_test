@@ -4,3 +4,5 @@ include_directories(../muduo)
 
 add_subdirectory(finger)
 add_subdirectory(sudoku)
+add_subdirectory(simple)
+add_subdirectory(filetransfer)
