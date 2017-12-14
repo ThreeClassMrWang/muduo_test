@@ -34,6 +34,7 @@ void ChatServer::onConnection(const muduo::net::TcpConnectionPtr &conn) {
 
 void ChatServer::onStringMessage(const muduo::net::TcpConnectionPtr &conn, const muduo::string& message,
                                  muduo::Timestamp receiveTime) {
+    // Copy on write, to minimize critical area
     ConnectionSet tempConnections;
     {
         MutexLockGuard lock(mutex_);
@@ -47,4 +48,8 @@ void ChatServer::onStringMessage(const muduo::net::TcpConnectionPtr &conn, const
 
 void ChatServer::start() {
     server_.start();
+}
+
+void ChatServer::setThreadNum(int threadNum) {
+    server_.setThreadNum(threadNum);
 }

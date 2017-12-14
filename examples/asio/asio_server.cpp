@@ -12,5 +12,6 @@ int main(int argc, char *argv[]) {
     InetAddress address(10000);
     ChatServer server(&loop, address);
     server.start();
+    server.setThreadNum(2);
     loop.loop();
 }

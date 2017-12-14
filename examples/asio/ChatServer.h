@@ -11,11 +11,13 @@
 #include <set>
 #include "Codec.h"
 
-class ChatServer {
+class ChatServer : muduo::noncopyable {
 public:
     ChatServer(muduo::net::EventLoop* loop, const muduo::net::InetAddress& addr);
 
     void start();
+
+    void setThreadNum(int threadNum);
 
 private:
     muduo::net::EventLoop* loop_;

@@ -8,7 +8,7 @@
 #include <functional>
 #include <muduo/net/TcpServer.h>
 
-class Codec {
+class Codec : muduo::noncopyable {
 public:
     using StringMessageCallback = std::function<void (const muduo::net::TcpConnectionPtr& conn,
             const muduo::string& message, muduo::Timestamp receiveTime)>;

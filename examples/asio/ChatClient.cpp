@@ -43,6 +43,7 @@ void ChatClient::onConnection(const muduo::net::TcpConnectionPtr &conn) {
              << " is "
              << (conn->connected() ? "UP" : "DOWN");
     if (conn->connected()) {
+        conn->setTcpNoDelay(true);
         muduo::MutexLockGuard lock(mutex_);
         connection_ = conn;
     } else {

@@ -11,7 +11,7 @@
 #include <muduo/base/Mutex.h>
 #include "Codec.h"
 
-class ChatClient {
+class ChatClient : muduo::noncopyable {
 public:
     ChatClient(muduo::net::EventLoop* loop, const muduo::net::InetAddress& address);
 
