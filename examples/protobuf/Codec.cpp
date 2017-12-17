@@ -10,7 +10,7 @@
 using namespace muduo::net;
 using namespace muduo;
 
-namespace detail {
+namespace codecDetail {
     static const string kNoErrorStr = "NoError";
     static const string kInvalidLengthStr = "InvalidLength";
     static const string kCheckSumErrorStr = "CheckSumError";
@@ -23,19 +23,19 @@ namespace detail {
 const string& Codec::errorCodeToString(ErrorCode errorCode) {
     switch (errorCode) {
         case kNoError:
-            return detail::kNoErrorStr;
+            return codecDetail::kNoErrorStr;
         case kInvalidLength:
-            return detail::kInvalidLengthStr;
+            return codecDetail::kInvalidLengthStr;
         case kCheckSumError:
-            return detail::kCheckSumErrorStr;
+            return codecDetail::kCheckSumErrorStr;
         case kInvalidNameLen:
-            return detail::kInvalidNameLenStr;
+            return codecDetail::kInvalidNameLenStr;
         case kUnknowMessageType:
-            return detail::kUnknowMessageTypeStr;
+            return codecDetail::kUnknowMessageTypeStr;
         case kParseError:
-            return detail::kParseErrorStr;
+            return codecDetail::kParseErrorStr;
         default:
-            return detail::kUnknowError;
+            return codecDetail::kUnknowError;
     }
 }
 
@@ -89,12 +89,12 @@ google::protobuf::Message* Codec::createMessage(const std::string &typeName) {
 Codec::MessagePtr Codec::parse(const char *buf, int len, ErrorCode *errorCode) {
     MessagePtr message;
 
-    int32_t be32 = *(static_cast<int32_t *>(buf + len - kHeaderLen));
+    int32_t be32 = *((int32_t *)(buf + len - kHeaderLen));
     int32_t expectCheckSum = muduo::net::sockets::networkToHost32(static_cast<uint32_t>(be32));
     int32_t checkSum = static_cast<int32_t> (::adler32(1, reinterpret_cast<const Bytef*>(buf),
                                                        static_cast<uInt>(len - kHeaderLen)));
     if (checkSum == expectCheckSum) {
-        be32 = *(static_cast<int32_t *>(buf));
+        be32 = *((int32_t *)(buf));
         int32_t nameLen = muduo::net::sockets::networkToHost32(static_cast<uint32_t>(be32));
         if (nameLen >= 2 && nameLen <= len - 2*kHeaderLen) {
             std::string typeName(buf + kHeaderLen, buf + kHeaderLen + nameLen - 1);
