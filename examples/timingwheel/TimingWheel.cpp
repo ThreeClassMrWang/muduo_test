@@ -20,6 +20,10 @@ void TimingWheel::add(const muduo::net::TcpConnectionPtr& conn) {
 
     LOG_INFO << "add " << tail_.get();
     muduo::MutexLockGuard lock(mutex_);
+    // Note: cannot use like that
+    // auto connectionSet = wheelMap_[tail_.get()];
+    // connectionSet.insert(entryPtr);
+    // This is error usage?? why
     wheelMap_[tail_.get()].insert(entryPtr);
     LOG_INFO << "entry use count: " << entryPtr.use_count();
 }
