@@ -26,6 +26,8 @@ private:
     using ConnectionSet = std::set<muduo::net::TcpConnectionPtr>;
     ConnectionSet connections_;
     muduo::MutexLock mutex_;
+    long kMaxConnectionNum_;
+    long kConnectionNum_;
 
     void onStringMessage(const muduo::net::TcpConnectionPtr& conn,
         const muduo::string& message, muduo::Timestamp receiveTime);

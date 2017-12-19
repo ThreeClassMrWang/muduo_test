@@ -12,7 +12,7 @@ class DiscardServer :noncopyable {
 public:
     DiscardServer(uint16_t port, const string& name) :
             loop_(), sevaddr_(port), server_(&loop_, sevaddr_, name) ,
-            timeWheel_(&loop_, 8) {
+            timeWheel_(&loop_, 8), lastUpdate_(0) {
         server_.setConnectionCallback(std::bind(&DiscardServer::onConnection, this, _1));
         server_.setMessageCallback(std::bind(&DiscardServer::onMessage,
                                              this, _1, _2, _3));
@@ -28,6 +28,7 @@ private:
     InetAddress sevaddr_;
     TcpServer server_;
     TimingWheel timeWheel_;
+    size_t lastUpdate_;
     
 
     void onMessage(const TcpConnectionPtr& conn,
@@ -38,7 +39,7 @@ private:
                  << msg.size()
                  << " bytes received at "
                  << conn->peerAddress().toIpPort();
-        timeWheel_.update(conn);
+        lastUpdate_ = timeWheel_.update(conn, lastUpdate_);
     }
 
     void onConnection(const TcpConnectionPtr& conn) {
@@ -52,7 +53,7 @@ private:
     }
 };
 
-int main(int argc, char* arcv[]) {
+int main(int argc, char* argv[]) {
     DiscardServer server(10000, "DiscardServer");
     server.start();
 }

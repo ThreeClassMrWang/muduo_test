@@ -62,7 +62,7 @@ public:
     TimingWheel(muduo::net::EventLoop* loop, size_t maxIdleTimeSecond);
 
     void add(const muduo::net::TcpConnectionPtr& conn);
-    void update(const muduo::net::TcpConnectionPtr& conn);
+    size_t update(const muduo::net::TcpConnectionPtr& conn, size_t lastUpdate);
 
 private:
     using ConnectionSet = std::unordered_set<EntryPtr>;

@@ -28,8 +28,15 @@ void TimingWheel::add(const muduo::net::TcpConnectionPtr& conn) {
     LOG_INFO << "entry use count: " << entryPtr.use_count();
 }
 
-void TimingWheel::update(const muduo::net::TcpConnectionPtr &conn) {
-    if (!conn->connected()) return;
+size_t TimingWheel::update(const muduo::net::TcpConnectionPtr &conn, size_t lastUpdate) {
+    if (!conn->connected()) return 0;
+    size_t res = 0;
+    {
+        muduo::MutexLockGuard lock(mutex_);
+        res = tail_.get();
+        if (lastUpdate == res)
+            return res;
+    }
     WeakEntryPtr weakEntryPtr = boost::any_cast<WeakEntryPtr>(conn->getContext());
     EntryPtr entryPtr = weakEntryPtr.lock();
     if (entryPtr) {
@@ -38,9 +45,11 @@ void TimingWheel::update(const muduo::net::TcpConnectionPtr &conn) {
         wheelMap_[tail_.get()].insert(entryPtr);
         LOG_INFO << "entry use count: " << entryPtr.use_count();
     }
+
+    return res;
 }
 
-void TimingWheel::onTimer(void) {
+void TimingWheel::onTimer() {
     LOG_INFO << "onTimer, erase " << tail_.getDec();
     muduo::MutexLockGuard lock(mutex_);
     wheelMap_.erase(tail_.getDec());

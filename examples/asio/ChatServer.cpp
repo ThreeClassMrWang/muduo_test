@@ -3,6 +3,7 @@
 //
 
 #include <muduo/base/Mutex.h>
+#include <unistd.h>
 #include "ChatServer.h"
 
 using namespace std::placeholders;
@@ -11,9 +12,11 @@ using namespace muduo;
 
 ChatServer::ChatServer(muduo::net::EventLoop *loop, const muduo::net::InetAddress &addr) :
     loop_(loop), server_(loop_, addr, "ChatServer"),
-    codec_(std::bind(&ChatServer::onStringMessage, this, _1, _2, _3)){
+    codec_(std::bind(&ChatServer::onStringMessage, this, _1, _2, _3)),
+    kConnectionNum_(0) {
     server_.setConnectionCallback(std::bind(&ChatServer::onConnection, this, _1));
     server_.setMessageCallback(std::bind(&Codec::onMessage, &codec_, _1, _2, _3));
+    kMaxConnectionNum_ = ::sysconf(_SC_OPEN_MAX) - 10;
 }
 
 void ChatServer::onConnection(const muduo::net::TcpConnectionPtr &conn) {
@@ -26,9 +29,16 @@ void ChatServer::onConnection(const muduo::net::TcpConnectionPtr &conn) {
         conn->setTcpNoDelay(true);
         MutexLockGuard lock(mutex_);
         connections_.insert(conn);
+        ++kConnectionNum_;
+        if (kConnectionNum_ > kMaxConnectionNum_) {
+            conn->shutdown();
+            LOG_ERROR << conn->name()
+                      << "exceeds max connections, auto disconnect";
+        }
     } else {
         MutexLockGuard lock(mutex_);
         connections_.erase(conn);
+        --kConnectionNum_;
     }
 }
 
