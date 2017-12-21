@@ -21,9 +21,12 @@ void TimingWheel::add(const muduo::net::TcpConnectionPtr& conn) {
     LOG_INFO << "add " << tail_.get();
     muduo::MutexLockGuard lock(mutex_);
     // Note: cannot use like that
-    // auto connectionSet = wheelMap_[tail_.get()];
+    // auto connectionSet = wheelMap_[tail_.get()];     // This is copy
     // connectionSet.insert(entryPtr);
     // This is error usage?? why
+    // Date: 2017.12.20, I know why, the code below is correct
+    // auto &connectionSet = wheelMap_[tail_.get()];    // This is reference
+    // connectionSet.insert(entryPtr);
     wheelMap_[tail_.get()].insert(entryPtr);
     LOG_INFO << "entry use count: " << entryPtr.use_count();
 }
