@@ -29,6 +29,8 @@ static void onConnection(const TcpConnectionPtr& conn) {
         conn->send(response, sizeof(response));
         LOG_INFO << "send reponse "
                  << response;
+    } else {
+        conn->getLoop()->quit();
     }
 }
 
@@ -36,7 +38,7 @@ static void onMessage(const TcpConnectionPtr& conn, Buffer* buff, Timestamp rece
     LOG_INFO << "Receive message "
              << string(buff->peek());
 
-    if (count < 10)
+    if (count <= 100000)
         conn->send("Hello");
 
     count++;
